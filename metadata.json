@@ -1,0 +1,6 @@
+{
+  "name": "Online Study Challenges",
+  "description": "Collaborative study portal featuring live focus challenges, real-time study rooms, web proctoring, leaderboard ranks, and server-side AI visual monitoring feedback.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
