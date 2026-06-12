@@ -158,6 +158,41 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
     }, 1000);
   };
 
+  const handleGuestLogin = () => {
+    setIsSubmitting(true);
+    setErrorString("");
+    // Create random gaming nickname using Preset default list
+    const randomNick = "Guest_" + DEFAULT_NICKNAMES[Math.floor(Math.random() * DEFAULT_NICKNAMES.length)] + Math.floor(Math.random() * 800 + 100);
+    const randomAvatar = PRESET_AVATARS[Math.floor(Math.random() * PRESET_AVATARS.length)];
+
+    setTimeout(async () => {
+      try {
+        let uid = localStorage.getItem("study_uid") || `user-guest-${Math.random().toString(36).substr(2, 9)}`;
+        localStorage.setItem("study_uid", uid);
+
+        const response = await fetch("/api/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ uid, username: randomNick, avatar: randomAvatar }),
+        });
+
+        if (response.ok) {
+          const user: User = await response.json();
+          setTempUser(user);
+          setWelcomeAnimating(true);
+          setTimeout(() => {
+            onLogin(user);
+          }, 2000);
+        } else {
+          throw new Error("Guest initialization server reject");
+        }
+      } catch (err: any) {
+        setErrorString(err.message || "Failed to enter study arena in guest mode");
+        setIsSubmitting(false);
+      }
+    }, 800);
+  };
+
   const handleSendForgot = (e: React.FormEvent) => {
     e.preventDefault();
     if (!forgotEmail.includes("@")) return;
@@ -441,6 +476,18 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
             <ArrowRight className="w-4 h-4 text-black stroke-[3]" />
           </button>
         </form>
+
+        {/* GUEST ACCESS OPTION */}
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            onClick={handleGuestLogin}
+            disabled={isSubmitting}
+            className="w-full bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 disabled:opacity-50 text-white font-extrabold uppercase tracking-widest py-3 px-4 rounded-xl text-xs transition-all duration-150 flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(255,0,127,0.35)] hover:cursor-pointer hover:scale-[1.01] active:scale-[0.98]"
+          >
+            <span>🕹️ GUEST SPEEDRUN (NO LOGIN REQUIRED)</span>
+          </button>
+        </div>
 
         {/* GOOGLE INTEGRATION DIVISION */}
         <div className="relative flex py-4 items-center">
